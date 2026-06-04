@@ -76,8 +76,6 @@ const profileFromData = (data) =>
 const ShareExportCta = () => (
   <div
     style={{
-      flexShrink: 0,
-      marginTop: "auto",
       width: "100%",
       background: "#C4622D",
       borderRadius: 10,
@@ -96,6 +94,7 @@ const ShareExportCta = () => (
 /** Share recap interior — `card` for on-screen slide; `story` + CTA for Instagram export only. */
 const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card", includeExportCta = false }) => {
   const isStory = variant === "story";
+  const isExportStory = isStory && includeExportCta;
   const gap = isStory ? 8 : 6;
   const photoH = isStory ? 140 : 100;
   const statRowMin = isStory ? 52 : 44;
@@ -106,10 +105,10 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
   return (
     <div
       style={{
-        position: "absolute",
-        inset: 0,
+        position: isExportStory ? "relative" : "absolute",
+        inset: isExportStory ? undefined : 0,
         width: "100%",
-        height: "100%",
+        height: isExportStory ? "100%" : "100%",
         boxSizing: "border-box",
       }}
     >
@@ -139,8 +138,8 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          gap: isStory && includeExportCta ? 0 : gap,
-          overflow: "hidden",
+          gap: isExportStory ? 8 : gap,
+          overflow: isExportStory ? "visible" : "hidden",
           boxSizing: "border-box",
         }}
       >
@@ -150,8 +149,6 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
             display: "flex",
             flexDirection: "column",
             gap,
-            minHeight: 0,
-            ...(isStory && includeExportCta ? { flex: "1 1 auto", minHeight: 0 } : {}),
           }}
         >
           <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: isStory ? 6 : 4 }}>
@@ -161,7 +158,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
                 fontFamily: "'Playfair Display', serif",
                 fontWeight: 700,
                 fontSize: harvestTitleSize,
-                color: "rgba(245,240,232,0.45)",
+                color: isExportStory ? "rgba(245,240,232,0.65)" : "rgba(245,240,232,0.45)",
                 lineHeight: 1.1,
               }}
             >
@@ -282,7 +279,11 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
           </div>
         </div>
 
-        {includeExportCta && <ShareExportCta />}
+        {includeExportCta && (
+          <div style={{ flexShrink: 0, marginTop: "auto", width: "100%" }}>
+            <ShareExportCta />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -309,25 +310,31 @@ const SHARE_STORY_PADDING = "20px";
 const SHARE_PNG_FILENAME = "fanstories-2025.png";
 const SHARE_SHEET_TITLE = "My 2025 Harvest";
 
-/** Captures the off-screen 390×844 story frame (recap + export CTA). */
+/** Captures the 390×844 story frame (recap + export CTA). Element must be in-viewport (opacity ~0) for reliable paint. */
 async function captureShareCardToPngBlob(captureEl) {
   await document.fonts.ready;
   try {
     await document.fonts.load('700 16px Inter');
     await document.fonts.load('700 13px Inter');
+    await document.fonts.load('700 22px "Playfair Display"');
+    await document.fonts.load('700 19px "Playfair Display"');
   } catch {
     /* fall back to system fonts */
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 120));
+  await new Promise((resolve) => setTimeout(resolve, 280));
 
   const canvas = await html2canvas(captureEl, {
     scale: 2,
     useCORS: true,
     backgroundColor: PALETTE.ink,
     logging: false,
-    width: SHARE_STORY_W,
-    height: SHARE_STORY_H,
+    width: captureEl.offsetWidth,
+    height: captureEl.offsetHeight,
+    scrollX: 0,
+    scrollY: 0,
+    windowWidth: captureEl.offsetWidth,
+    windowHeight: captureEl.offsetHeight,
   });
   return await new Promise((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG export failed"))), "image/png");
@@ -768,7 +775,7 @@ export default function App() {
     let cancelled = false;
 
     const runPregen = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 220));
+      await new Promise((resolve) => setTimeout(resolve, 380));
       if (cancelled || sharePregenGenRef.current !== gen) return;
 
       const captureEl = shareCaptureRef.current;
@@ -937,16 +944,17 @@ export default function App() {
               aria-hidden="true"
               style={{
                 position: "fixed",
-                left: -10000,
+                left: 0,
                 top: 0,
                 width: SHARE_STORY_W,
                 height: SHARE_STORY_H,
                 boxSizing: "border-box",
                 padding: SHARE_STORY_PADDING,
                 background: PALETTE.ink,
-                overflow: "hidden",
+                overflow: "visible",
                 pointerEvents: "none",
-                zIndex: -1,
+                opacity: 0.01,
+                zIndex: 0,
               }}
             >
               <ShareCardScene
