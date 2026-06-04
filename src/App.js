@@ -73,178 +73,225 @@ const PROFILE_CONTENT = {
 const profileFromData = (data) =>
   PROFILE_CONTENT[data.cooking_style] || PROFILE_CONTENT.gastronaut;
 
-/** Full-bleed share card interior (Grain + gradients + compact column for story capture). */
-const ShareCardScene = ({ data, profile, shoppingTimeSavedHours }) => (
+const ShareExportCta = () => (
   <div
     style={{
-      position: "absolute",
-      inset: 0,
+      flexShrink: 0,
+      marginTop: "auto",
       width: "100%",
-      height: "100%",
-      boxSizing: "border-box",
+      background: "#C4622D",
+      borderRadius: 10,
+      padding: "12px 14px",
+      textAlign: "center",
+      boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
     }}
   >
-    <Grain opacity={0.06} />
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: `radial-gradient(ellipse at 20% 90%, rgba(196,98,45,0.15) 0%, transparent 50%)`,
-        zIndex: 2,
-        pointerEvents: "none",
-      }}
-    />
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: `radial-gradient(ellipse at 85% 10%, rgba(45,74,62,0.35) 0%, transparent 55%)`,
-        zIndex: 2,
-        pointerEvents: "none",
-      }}
-    />
-    <div
-      style={{
-        position: "relative",
-        zIndex: 5,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        boxSizing: "border-box",
-      }}
-    >
-      <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", gap: 8, minHeight: 0 }}>
-      <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 6 }}>
-        <FreshPlateLogo color="rgba(245,240,232,0.95)" size={1.1} hideSubtitle />
-        <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "rgba(245,240,232,0.45)", lineHeight: 1.1 }}>Your 2025 Harvest</div>
-        <div style={{ width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(245,240,232,0.2), transparent)" }} />
-      </div>
-
-      <div style={{ flexShrink: 0, background: "rgba(245,240,232,0.07)", borderRadius: 12, padding: "8px 10px", border: "1px solid rgba(245,240,232,0.1)" }}>
-        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(245,240,232,0.4)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>Persona</div>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 18, color: "#F5F0E8", lineHeight: 1.15 }}>{profile.title}</div>
-        <p
-          style={{
-            margin: 0,
-            marginTop: 4,
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 11,
-            fontStyle: "italic",
-            fontWeight: 400,
-            color: "rgba(245,240,232,0.5)",
-            lineHeight: 1.35,
-          }}
-        >
-          {profile.shareSummary ?? profile.body}
-        </p>
-      </div>
-
-      <div
-        style={{
-          flexShrink: 0,
-          display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-          gridTemplateRows: "repeat(2, minmax(52px, 1fr))",
-          gap: 8,
-          width: "100%",
-        }}
-      >
-        {[
-          { val: data.meals, lbl: "meals cooked", accent: PALETTE.terracotta },
-          { val: data.recipes, lbl: "recipes learned", accent: PALETTE.cream },
-          { val: `${shoppingTimeSavedHours}hrs`, lbl: "saved on shopping", accent: PALETTE.terracotta },
-          { val: `${data.co2_saved} kg`, lbl: "CO₂ saved", accent: "#8FB5A3" },
-        ].map((s, i) => (
-          <div
-            key={i}
-            style={{
-              background: "rgba(245,240,232,0.06)",
-              padding: "8px 10px",
-              borderRadius: 10,
-              border: "1px solid rgba(245,240,232,0.08)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              minWidth: 0,
-              overflow: "hidden",
-            }}
-          >
-            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 20, color: s.accent, lineHeight: 1, letterSpacing: -0.3 }}>{s.val}</div>
-            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.3, marginTop: 4 }}>{s.lbl}</div>
-          </div>
-        ))}
-      </div>
-
-      <div
-        role="img"
-        aria-label={`${data.favorite_meal} dish`}
-        style={{
-          position: "relative",
-          width: "100%",
-          height: 140,
-          flexShrink: 0,
-          borderRadius: 12,
-          overflow: "hidden",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.25)",
-          backgroundColor: "#141414",
-          backgroundImage: `url("${FAVORITE_MEAL_HERO_IMAGE}")`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(180deg, rgba(26,26,26,0.12) 0%, rgba(26,26,26,0.35) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            padding: "8px 10px",
-            background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.92) 35%, rgba(10,10,10,0.97) 100%)",
-            pointerEvents: "none",
-          }}
-        >
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 8, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.4, marginBottom: 2 }}>
-            Favorite meal
-          </div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 15, color: "#F5F0E8", lineHeight: 1.15 }}>{data.favorite_meal}</div>
-        </div>
-      </div>
-
-      <div style={{ flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "rgba(245,240,232,0.28)", letterSpacing: 1.2 }}>#FreshPlate2025</span>
-      </div>
-      </div>
-
-      <div
-        style={{
-          flexShrink: 0,
-          marginTop: "auto",
-          width: "100%",
-          background: "#C4622D",
-          borderRadius: 10,
-          padding: "12px 14px",
-          textAlign: "center",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-        }}
-      >
-        <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 16, color: "#ffffff", lineHeight: 1.25 }}>Get 15% off FreshPlate</div>
-        <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 13, color: "#ffffff", lineHeight: 1.35, marginTop: 4 }}>
-          Use code 2025HARVEST at checkout
-        </div>
-      </div>
+    <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 16, color: "#ffffff", lineHeight: 1.25 }}>Get 15% off FreshPlate</div>
+    <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 13, color: "#ffffff", lineHeight: 1.35, marginTop: 4 }}>
+      Use code 2025HARVEST at checkout
     </div>
   </div>
 );
+
+/** Share recap interior — `card` for on-screen slide; `story` + CTA for Instagram export only. */
+const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card", includeExportCta = false }) => {
+  const isStory = variant === "story";
+  const gap = isStory ? 8 : 6;
+  const photoH = isStory ? 140 : 100;
+  const statRowMin = isStory ? 52 : 44;
+  const statValSize = isStory ? 20 : 18;
+  const personaTitleSize = isStory ? 18 : 16;
+  const harvestTitleSize = isStory ? 22 : 19;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      <Grain opacity={0.06} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `radial-gradient(ellipse at 20% 90%, rgba(196,98,45,0.15) 0%, transparent 50%)`,
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `radial-gradient(ellipse at 85% 10%, rgba(45,74,62,0.35) 0%, transparent 55%)`,
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "relative",
+          zIndex: 5,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: isStory && includeExportCta ? 0 : gap,
+          overflow: "hidden",
+          boxSizing: "border-box",
+        }}
+      >
+        <div
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap,
+            minHeight: 0,
+            ...(isStory && includeExportCta ? { flex: "1 1 auto", minHeight: 0 } : {}),
+          }}
+        >
+          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: isStory ? 6 : 4 }}>
+            <FreshPlateLogo color="rgba(245,240,232,0.95)" size={isStory ? 1.1 : 1} hideSubtitle />
+            <div
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontWeight: 700,
+                fontSize: harvestTitleSize,
+                color: "rgba(245,240,232,0.45)",
+                lineHeight: 1.1,
+              }}
+            >
+              Your 2025 Harvest
+            </div>
+            <div style={{ width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(245,240,232,0.2), transparent)" }} />
+          </div>
+
+          <div
+            style={{
+              flexShrink: 0,
+              background: "rgba(245,240,232,0.07)",
+              borderRadius: 12,
+              padding: isStory ? "8px 10px" : "7px 9px",
+              border: "1px solid rgba(245,240,232,0.1)",
+            }}
+          >
+            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(245,240,232,0.4)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>Persona</div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: personaTitleSize, color: "#F5F0E8", lineHeight: 1.15 }}>{profile.title}</div>
+            <p
+              style={{
+                margin: 0,
+                marginTop: 4,
+                fontFamily: "'Inter', sans-serif",
+                fontSize: isStory ? 11 : 10,
+                fontStyle: "italic",
+                fontWeight: 400,
+                color: "rgba(245,240,232,0.5)",
+                lineHeight: 1.35,
+              }}
+            >
+              {profile.shareSummary ?? profile.body}
+            </p>
+          </div>
+
+          <div
+            style={{
+              flexShrink: 0,
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gridTemplateRows: `repeat(2, minmax(${statRowMin}px, 1fr))`,
+              gap: isStory ? 8 : 6,
+              width: "100%",
+            }}
+          >
+            {[
+              { val: data.meals, lbl: "meals cooked", accent: PALETTE.terracotta },
+              { val: data.recipes, lbl: "recipes learned", accent: PALETTE.cream },
+              { val: `${shoppingTimeSavedHours}hrs`, lbl: "saved on shopping", accent: PALETTE.terracotta },
+              { val: `${data.co2_saved} kg`, lbl: "CO₂ saved", accent: "#8FB5A3" },
+            ].map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  background: "rgba(245,240,232,0.06)",
+                  padding: isStory ? "8px 10px" : "6px 8px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(245,240,232,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  minWidth: 0,
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: statValSize, color: s.accent, lineHeight: 1, letterSpacing: -0.3 }}>{s.val}</div>
+                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.3, marginTop: 3 }}>{s.lbl}</div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            role="img"
+            aria-label={`${data.favorite_meal} dish`}
+            style={{
+              position: "relative",
+              width: "100%",
+              height: photoH,
+              flexShrink: 0,
+              borderRadius: 12,
+              overflow: "hidden",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.25)",
+              backgroundColor: "#141414",
+              backgroundImage: `url("${FAVORITE_MEAL_HERO_IMAGE}")`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(180deg, rgba(26,26,26,0.12) 0%, rgba(26,26,26,0.35) 100%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                padding: "8px 10px",
+                background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.92) 35%, rgba(10,10,10,0.97) 100%)",
+                pointerEvents: "none",
+              }}
+            >
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 8, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.4, marginBottom: 2 }}>
+                Favorite meal
+              </div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: isStory ? 15 : 14, color: "#F5F0E8", lineHeight: 1.15 }}>{data.favorite_meal}</div>
+            </div>
+          </div>
+
+          <div style={{ flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "rgba(245,240,232,0.28)", letterSpacing: 1.2 }}>#FreshPlate2025</span>
+          </div>
+        </div>
+
+        {includeExportCta && <ShareExportCta />}
+      </div>
+    </div>
+  );
+};
+
+const shoppingTimeSavedHoursFromData = (data) => {
+  const groceryTripsAvoided = Math.round(data.meals / data.meals_per_grocery_shop);
+  return Math.round((groceryTripsAvoided * data.mins_planning_shopping_per_trip) / 60);
+};
 
 const downloadPngBlob = (blob, filename = "fanstories-2025.png") => {
   const a = document.createElement("a");
@@ -262,7 +309,7 @@ const SHARE_STORY_PADDING = "20px";
 const SHARE_PNG_FILENAME = "fanstories-2025.png";
 const SHARE_SHEET_TITLE = "My 2025 Harvest";
 
-/** Captures the fixed 390×844 story frame (CTA always in DOM). */
+/** Captures the off-screen 390×844 story frame (recap + export CTA). */
 async function captureShareCardToPngBlob(captureEl) {
   await document.fonts.ready;
   try {
@@ -657,7 +704,7 @@ const slides = (data) => {
       progressBarTheme: "dark",
       logoOnDark: true,
       render: () => (
-        <ShareCardScene data={data} profile={profile} shoppingTimeSavedHours={shoppingTimeSavedHours} />
+        <ShareCardScene data={data} profile={profile} shoppingTimeSavedHours={shoppingTimeSavedHours} variant="card" />
       ),
     },
   ];
@@ -676,6 +723,8 @@ export default function App() {
   const cachedShareBlob = useRef(null);
   const sharePregenGenRef = useRef(0);
   const data = WRAPPED_DATA;
+  const profile = profileFromData(data);
+  const shoppingTimeSavedHours = shoppingTimeSavedHoursFromData(data);
   const allSlides = slides(data);
   const lastSlideIdx = allSlides.length - 1;
 
@@ -776,7 +825,6 @@ export default function App() {
   };
 
   const slide = allSlides[idx];
-  const isShareSlide = idx === lastSlideIdx;
   const progressBar = PROGRESS_BAR[slide.progressBarTheme];
 
   return (
@@ -790,51 +838,34 @@ export default function App() {
         button:disabled{opacity:.75;cursor:wait}
       `}</style>
 
-      <div style={{ width: "100%", maxWidth: isShareSlide ? SHARE_STORY_W : 390 }}>
+      <div style={{ width: "100%", maxWidth: 390 }}>
         <div>
           <div
             ref={shareCardFrameRef}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
             style={{
-              borderRadius: isShareSlide ? 0 : 28,
+              borderRadius: 28,
               overflow: "hidden",
-              width: isShareSlide ? SHARE_STORY_W : "100%",
-              height: isShareSlide ? SHARE_STORY_H : 620,
+              width: "100%",
+              height: 620,
               position: "relative",
-              boxShadow: isShareSlide ? "none" : "0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(245,240,232,0.06)",
+              boxShadow: "0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(245,240,232,0.06)",
               background: slide.bg,
-              margin: isShareSlide ? "0 auto" : undefined,
             }}
           >
             <div
-              ref={shareCaptureRef}
-              style={
-                isShareSlide
-                  ? {
-                      position: "relative",
-                      width: SHARE_STORY_W,
-                      height: SHARE_STORY_H,
-                      boxSizing: "border-box",
-                      padding: SHARE_STORY_PADDING,
-                      background: slide.bg,
-                      opacity: visible ? 1 : 0,
-                      transform: visible ? "translateY(0)" : `translateY(${dir * 14}px)`,
-                      transition: "opacity 0.16s ease, transform 0.16s ease",
-                      zIndex: 20,
-                      overflow: "hidden",
-                    }
-                  : {
-                      position: "absolute",
-                      inset: 0,
-                      padding: "36px 30px 60px",
-                      background: slide.bg,
-                      opacity: visible ? 1 : 0,
-                      transform: visible ? "translateY(0)" : `translateY(${dir * 14}px)`,
-                      transition: "opacity 0.16s ease, transform 0.16s ease",
-                      zIndex: 20,
-                    }
-              }
+              style={{
+                position: "absolute",
+                inset: 0,
+                padding: "36px 30px 60px",
+                background: slide.bg,
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateY(0)" : `translateY(${dir * 14}px)`,
+                transition: "opacity 0.16s ease, transform 0.16s ease",
+                zIndex: 20,
+                overflow: "hidden",
+              }}
             >
               {slide.render()}
             </div>
@@ -899,6 +930,34 @@ export default function App() {
               }}
             />
           </div>
+
+          {idx === lastSlideIdx && (
+            <div
+              ref={shareCaptureRef}
+              aria-hidden="true"
+              style={{
+                position: "fixed",
+                left: -10000,
+                top: 0,
+                width: SHARE_STORY_W,
+                height: SHARE_STORY_H,
+                boxSizing: "border-box",
+                padding: SHARE_STORY_PADDING,
+                background: PALETTE.ink,
+                overflow: "hidden",
+                pointerEvents: "none",
+                zIndex: -1,
+              }}
+            >
+              <ShareCardScene
+                data={data}
+                profile={profile}
+                shoppingTimeSavedHours={shoppingTimeSavedHours}
+                variant="story"
+                includeExportCta
+              />
+            </div>
+          )}
 
           {idx === lastSlideIdx && (
             <button
