@@ -260,7 +260,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, showExportCta }
 
 const FRESHPLATE_SHARE_URL = "https://freshplate.com/wrapped/2025";
 
-const downloadPngBlob = (blob, filename = "freshplate-2025-wrapped.png") => {
+const downloadPngBlob = (blob, filename = "fanstories-2025.png") => {
   const a = document.createElement("a");
   const url = URL.createObjectURL(blob);
   a.href = url;
@@ -714,7 +714,6 @@ export default function App() {
   const [dir, setDir] = useState(1);
   const touchStart = useRef(null);
   const [shareLoading, setShareLoading] = useState(false);
-  const [copyToast, setCopyToast] = useState(false);
   const shareCaptureRef = useRef(null);
   const shareCardFrameRef = useRef(null);
   const [shareSnapshotShowCta, setShareSnapshotShowCta] = useState(false);
@@ -745,8 +744,8 @@ export default function App() {
   const handleShare = async () => {
     if (shareLoading) return;
 
-    const title = "My FreshPlate — Your 2025 Harvest";
-    const url = FRESHPLATE_SHARE_URL;
+    const title = "FanStories - Your Year, Your Story";
+    const text = `A personalized visual recap for every customer. ${FRESHPLATE_SHARE_URL}`;
 
     setShareLoading(true);
     try {
@@ -754,21 +753,15 @@ export default function App() {
       const frameEl = shareCardFrameRef.current;
       if (!captureEl || !frameEl) throw new Error("Share card not ready");
       const blob = await captureShareCardToPngBlob(captureEl, frameEl, setShareSnapshotShowCta);
-      const file = new File([blob], "freshplate-2025-wrapped.png", { type: "image/png" });
+      const file = new File([blob], "fanstories-2025.png", { type: "image/png" });
 
-      if (!navigator.share) {
-        try {
-          await navigator.clipboard.writeText(url);
-          setCopyToast(true);
-          setTimeout(() => setCopyToast(false), 2000);
-        } catch (e) {
-          console.error(e);
-        }
+      if (typeof navigator.share !== "function") {
+        downloadPngBlob(blob);
         return;
       }
 
-      const shareData = { title, url, files: [file] };
-      const canShareFiles = typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] });
+      const canShareFiles =
+        typeof navigator.canShare === "function" && navigator.canShare({ files: [file] });
 
       if (!canShareFiles) {
         downloadPngBlob(blob);
@@ -776,7 +769,7 @@ export default function App() {
       }
 
       try {
-        await navigator.share(shareData);
+        await navigator.share({ files: [file], title, text });
       } catch (e) {
         if (e?.name === "AbortError") return;
         downloadPngBlob(blob);
@@ -939,29 +932,6 @@ export default function App() {
         </div>
       </div>
 
-      {copyToast && (
-        <div
-          role="status"
-          style={{
-            position: "fixed",
-            bottom: "max(24px, env(safe-area-inset-bottom))",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 20000,
-            background: "rgba(45,74,62,0.96)",
-            color: "#F5F0E8",
-            padding: "10px 22px",
-            borderRadius: 20,
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 14,
-            fontWeight: 500,
-            boxShadow: "0 4px 24px rgba(0,0,0,0.35)",
-            pointerEvents: "none",
-          }}
-        >
-          Copied!
-        </div>
-      )}
     </div>
   );
 }
