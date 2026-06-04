@@ -258,6 +258,8 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, showExportCta }
   </div>
 );
 
+const FRESHPLATE_SHARE_URL = "https://freshplate.com/wrapped/2025";
+
 const downloadPngBlob = (blob, filename = "fanstories-2025.png") => {
   const a = document.createElement("a");
   const url = URL.createObjectURL(blob);
@@ -743,6 +745,7 @@ export default function App() {
     if (shareLoading) return;
 
     const title = "FanStories - Your Year, Your Story";
+    const text = `A personalized visual recap for every customer. ${FRESHPLATE_SHARE_URL}`;
 
     setShareLoading(true);
     try {
@@ -766,7 +769,7 @@ export default function App() {
       }
 
       try {
-        await navigator.share({ files: [file], title });
+        await navigator.share({ files: [file], title, text });
       } catch (e) {
         if (e?.name === "AbortError") return;
         downloadPngBlob(blob);
