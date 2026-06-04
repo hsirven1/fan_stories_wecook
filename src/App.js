@@ -1,4 +1,4 @@
-import { useState, useRef, useId } from "react";
+import { useState, useRef, useId, useEffect } from "react";
 import { flushSync } from "react-dom";
 import html2canvas from "html2canvas";
 
@@ -281,6 +281,9 @@ const downloadPngBlob = (blob, filename = "fanstories-2025.png") => {
 const SHARE_STORY_W = 390;
 const SHARE_STORY_H = 844;
 const SHARE_STORY_PADDING = "48px 32px 32px 32px";
+const SHARE_PNG_FILENAME = "fanstories-2025.png";
+const SHARE_TITLE = "FanStories - Your Year, Your Story";
+const SHARE_TEXT = `A personalized visual recap for every customer. ${FRESHPLATE_SHARE_URL}`;
 
 /**
  * Captures the fixed 390×844 story frame. Toggles export CTA via React state, then html2canvas at scale 2.
@@ -696,13 +699,18 @@ export default function App() {
   const [visible, setVisible] = useState(true);
   const [dir, setDir] = useState(1);
   const touchStart = useRef(null);
-  const [shareLoading, setShareLoading] = useState(false);
+  const [sharePreparing, setSharePreparing] = useState(false);
+  const [shareReady, setShareReady] = useState(false);
   const shareCaptureRef = useRef(null);
   const shareCardFrameRef = useRef(null);
+  const shareFileRef = useRef(null);
+  const shareBlobRef = useRef(null);
+  const sharePregenGenRef = useRef(0);
   const [shareSnapshotShowCta, setShareSnapshotShowCta] = useState(false);
 
   const data = WRAPPED_DATA;
   const allSlides = slides(data, shareSnapshotShowCta);
+  const lastSlideIdx = allSlides.length - 1;
 
   const goTo = (nextIdx) => {
     if (nextIdx < 0 || nextIdx >= allSlides.length) return;
@@ -724,47 +732,84 @@ export default function App() {
     touchStart.current = null;
   };
 
-  const handleShare = async () => {
-    if (shareLoading) return;
+  /** Pre-generate share PNG when the recap slide is shown so navigator.share runs inside the tap gesture on iOS. */
+  useEffect(() => {
+    if (idx !== lastSlideIdx || !visible) {
+      sharePregenGenRef.current += 1;
+      shareFileRef.current = null;
+      shareBlobRef.current = null;
+      setShareReady(false);
+      setSharePreparing(false);
+      return;
+    }
 
-    const title = "FanStories - Your Year, Your Story";
-    const text = `A personalized visual recap for every customer. ${FRESHPLATE_SHARE_URL}`;
+    const gen = ++sharePregenGenRef.current;
+    shareFileRef.current = null;
+    shareBlobRef.current = null;
+    setShareReady(false);
+    setSharePreparing(true);
 
-    setShareLoading(true);
-    try {
+    let cancelled = false;
+
+    const runPregen = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 220));
+      if (cancelled || sharePregenGenRef.current !== gen) return;
+
       const captureEl = shareCaptureRef.current;
-      if (!captureEl) throw new Error("Share card not ready");
-      const blob = await captureShareCardToPngBlob(captureEl, setShareSnapshotShowCta);
-      const file = new File([blob], "fanstories-2025.png", { type: "image/png" });
-
-      if (typeof navigator.share !== "function") {
-        downloadPngBlob(blob);
-        return;
-      }
-
-      const canShareFiles =
-        typeof navigator.canShare === "function" && navigator.canShare({ files: [file] });
-
-      if (!canShareFiles) {
-        downloadPngBlob(blob);
+      if (!captureEl) {
+        if (!cancelled && sharePregenGenRef.current === gen) setSharePreparing(false);
         return;
       }
 
       try {
-        await navigator.share({ files: [file], title, text });
+        const blob = await captureShareCardToPngBlob(captureEl, setShareSnapshotShowCta);
+        if (cancelled || sharePregenGenRef.current !== gen) return;
+        shareBlobRef.current = blob;
+        shareFileRef.current = new File([blob], SHARE_PNG_FILENAME, { type: "image/png" });
+        setShareReady(true);
       } catch (e) {
-        if (e?.name === "AbortError") return;
-        downloadPngBlob(blob);
+        console.error(e);
+      } finally {
+        if (!cancelled && sharePregenGenRef.current === gen) setSharePreparing(false);
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setShareLoading(false);
+    };
+
+    runPregen();
+
+    return () => {
+      cancelled = true;
+      sharePregenGenRef.current += 1;
+    };
+  }, [idx, visible, lastSlideIdx]);
+
+  const handleShare = () => {
+    if (sharePreparing || !shareReady) return;
+
+    const file = shareFileRef.current;
+    const blob = shareBlobRef.current;
+    if (!file || !blob) return;
+
+    if (typeof navigator.share !== "function") {
+      downloadPngBlob(blob);
+      return;
     }
+
+    const canShareFiles =
+      typeof navigator.canShare === "function" && navigator.canShare({ files: [file] });
+
+    if (!canShareFiles) {
+      downloadPngBlob(blob);
+      return;
+    }
+
+    navigator.share({ files: [file], title: SHARE_TITLE, text: SHARE_TEXT }).catch((e) => {
+      if (e?.name === "AbortError") return;
+      downloadPngBlob(blob);
+    });
   };
 
   const slide = allSlides[idx];
-  const isShareSlide = idx === allSlides.length - 1;
+  const isShareSlide = idx === lastSlideIdx;
   const progressBar = PROGRESS_BAR[slide.progressBarTheme];
 
   return (
@@ -888,10 +933,10 @@ export default function App() {
             />
           </div>
 
-          {idx === allSlides.length - 1 && (
+          {idx === lastSlideIdx && (
             <button
               type="button"
-              disabled={shareLoading}
+              disabled={sharePreparing || !shareReady}
               onClick={handleShare}
               style={{
                 width: "100%",
@@ -909,10 +954,11 @@ export default function App() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 10,
+                opacity: sharePreparing ? 0.85 : 1,
               }}
             >
-              {shareLoading ? (
-                <svg width="20" height="20" viewBox="0 0 100 100" fill="none" style={{ animation: "spin 0.85s linear infinite" }}>
+              {sharePreparing ? (
+                <svg width="18" height="18" viewBox="0 0 100 100" fill="none" style={{ animation: "spin 0.85s linear infinite", opacity: 0.9 }}>
                   <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="10" strokeDasharray="66 200" strokeLinecap="round" />
                 </svg>
               ) : (
@@ -924,7 +970,7 @@ export default function App() {
                   <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                 </svg>
               )}
-              Share my 2025 recap
+              {sharePreparing ? "Preparing image…" : "Share my 2025 recap"}
             </button>
           )}
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "rgba(245,240,232,0.22)", textAlign: "center", marginTop: 10 }}>
