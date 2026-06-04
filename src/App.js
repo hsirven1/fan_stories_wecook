@@ -115,7 +115,6 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, showExportCta }
         flexDirection: "column",
         minHeight: "100%",
         gap: 10,
-        padding: "0 4px",
         paddingBottom: showExportCta ? 14 : 12,
         overflow: showExportCta ? "visible" : "hidden",
       }}
@@ -222,36 +221,35 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, showExportCta }
           maxHeight: showExportCta ? 500 : 0,
           overflow: "hidden",
           flexShrink: 0,
-          background: "#1A1A1A",
-          border: "1px solid #C4622D",
+          background: "#C4622D",
           borderRadius: 8,
-          padding: 12,
-          margin: 8,
+          padding: "14px 16px",
           textAlign: "center",
           pointerEvents: "none",
         }}
       >
         <div
           style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic",
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 700,
             fontSize: 16,
-            color: "#F5F0E8",
+            color: "#ffffff",
             lineHeight: 1.25,
           }}
         >
-          Try FreshPlate today
+          Get 15% off FreshPlate
         </div>
         <div
           style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: 11,
-            color: "rgba(245,240,232,0.6)",
-            lineHeight: 1.4,
-            marginTop: 6,
+            fontWeight: 500,
+            fontSize: 13,
+            color: "#ffffff",
+            lineHeight: 1.35,
+            marginTop: 4,
           }}
         >
-          Use code HARVEST2025 for 15% off your first box
+          Use code 2025HARVEST at checkout
         </div>
       </div>
     </div>
@@ -297,8 +295,8 @@ function captureSubtreeOuterSize(rootEl) {
 async function captureShareCardToPngBlob(captureEl, frameEl, setShowExportCta) {
   await document.fonts.ready;
   try {
-    await document.fonts.load('italic 600 16px "Playfair Display"');
-    await document.fonts.load('400 11px Inter');
+    await document.fonts.load('700 16px Inter');
+    await document.fonts.load('500 13px Inter');
   } catch {
     /* fall back to system fonts */
   }
@@ -782,6 +780,7 @@ export default function App() {
   };
 
   const slide = allSlides[idx];
+  const isShareSlide = idx === allSlides.length - 1;
   const progressBar = PROGRESS_BAR[slide.progressBarTheme];
 
   return (
@@ -804,7 +803,7 @@ export default function App() {
             style={{
               borderRadius: 28,
               overflow: "hidden",
-              height: 620,
+              height: isShareSlide ? 700 : 620,
               position: "relative",
               boxShadow: "0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(245,240,232,0.06)",
               background: slide.bg,
@@ -815,7 +814,7 @@ export default function App() {
               style={{
                 position: "absolute",
                 inset: 0,
-                padding: "36px 30px 60px",
+                padding: isShareSlide ? "64px 24px 64px" : "36px 30px 60px",
                 background: slide.bg,
                 opacity: visible ? 1 : 0,
                 transform: visible ? "translateY(0)" : `translateY(${dir * 14}px)`,
