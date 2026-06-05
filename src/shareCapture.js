@@ -2,7 +2,7 @@ import html2canvas from "html2canvas";
 
 export const SHARE_STORY_W = 390;
 export const SHARE_STORY_H = 844;
-export const SHARE_STORY_PADDING = "20px";
+export const SHARE_STORY_PADDING = "36px 28px 20px";
 export const SHARE_CAPTURE_BG = "#1A1A1A";
 export const SHARE_PNG_FILENAME = "fanstories-2025.png";
 export const SHARE_SHEET_TITLE = "My 2025 Harvest";

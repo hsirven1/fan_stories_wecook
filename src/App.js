@@ -101,20 +101,20 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
   const isStory = variant === "story";
   const isCard = variant === "card";
   const isExportStory = isStory && includeExportCta;
-  const gap = isCard ? 8 : isStory ? 8 : 6;
-  const photoH = isCard ? 96 : isStory ? 140 : 100;
-  const statRowMin = isCard ? 52 : isStory ? 52 : 44;
-  const statValSize = isCard ? 22 : isStory ? 20 : 18;
-  const statLabelSize = isCard ? 11 : 9;
-  const personaTitleSize = isCard ? 20 : isStory ? 18 : 16;
-  const personaLabelSize = isCard ? 11 : 9;
-  const personaBodySize = isCard ? 13 : isStory ? 11 : 10;
-  const harvestTitleSize = isCard ? 24 : isStory ? 22 : 19;
-  const mealLabelSize = isCard ? 10 : 8;
-  const mealTitleSize = isCard ? 17 : isStory ? 15 : 14;
-  const logoSize = isCard ? 1.15 : isStory ? 1.1 : 1;
-  const boxPadding = isCard ? "10px 12px" : isStory ? "8px 10px" : "7px 9px";
-  const statBoxPadding = isCard ? "10px 12px" : isStory ? "8px 10px" : "6px 8px";
+  const gap = isCard ? 8 : isExportStory ? 10 : isStory ? 8 : 6;
+  const photoH = isCard ? 96 : isExportStory ? 128 : isStory ? 140 : 100;
+  const statRowMin = isCard ? 52 : isExportStory ? 56 : isStory ? 52 : 44;
+  const statValSize = isCard ? 22 : isExportStory ? 24 : isStory ? 20 : 18;
+  const statLabelSize = isCard ? 11 : isExportStory ? 12 : 9;
+  const personaTitleSize = isCard ? 20 : isExportStory ? 21 : isStory ? 18 : 16;
+  const personaLabelSize = isCard ? 11 : isExportStory ? 12 : 9;
+  const personaBodySize = isCard ? 13 : isExportStory ? 13 : isStory ? 11 : 10;
+  const harvestTitleSize = isCard ? 24 : isExportStory ? 26 : isStory ? 22 : 19;
+  const mealLabelSize = isCard ? 10 : isExportStory ? 11 : 8;
+  const mealTitleSize = isCard ? 17 : isExportStory ? 17 : isStory ? 15 : 14;
+  const logoSize = isCard ? 1.15 : isExportStory ? 1.22 : isStory ? 1.1 : 1;
+  const boxPadding = isCard ? "10px 12px" : isExportStory ? "10px 12px" : isStory ? "8px 10px" : "7px 9px";
+  const statBoxPadding = isCard ? "10px 12px" : isExportStory ? "10px 12px" : isStory ? "8px 10px" : "6px 8px";
 
   return (
     <div
@@ -152,10 +152,11 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          gap: isExportStory ? 8 : gap,
+          gap: isExportStory ? 10 : gap,
           overflow: isExportStory ? "visible" : "hidden",
           boxSizing: "border-box",
           ...(isCard ? { padding: "10px 14px 0" } : {}),
+          ...(isExportStory ? { padding: "4px 6px 0" } : {}),
         }}
       >
         <div
@@ -163,17 +164,27 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
             flexShrink: 0,
             display: "flex",
             flexDirection: "column",
-            gap,
+            gap: isExportStory ? 10 : gap,
           }}
         >
-          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: isCard ? 6 : isStory ? 6 : 4 }}>
+          <div
+            style={{
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              gap: isExportStory ? 10 : isCard ? 6 : isStory ? 6 : 4,
+              ...(isExportStory ? { paddingTop: 8, paddingBottom: 4 } : {}),
+            }}
+          >
             <FreshPlateLogo color="rgba(245,240,232,0.95)" size={logoSize} hideSubtitle />
             <div
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontWeight: 700,
                 fontSize: harvestTitleSize,
-                color: isCard ? "rgba(245,240,232,0.62)" : isExportStory ? "rgba(245,240,232,0.65)" : "rgba(245,240,232,0.45)",
+                color: isCard ? "rgba(245,240,232,0.62)" : isExportStory ? "rgba(245,240,232,0.78)" : "rgba(245,240,232,0.45)",
                 lineHeight: 1.1,
               }}
             >
@@ -201,7 +212,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
                 fontSize: personaBodySize,
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: isCard ? "rgba(245,240,232,0.62)" : "rgba(245,240,232,0.5)",
+                color: isCard ? "rgba(245,240,232,0.62)" : isExportStory ? "rgba(245,240,232,0.65)" : "rgba(245,240,232,0.5)",
                 lineHeight: 1.35,
               }}
             >
@@ -215,7 +226,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
               gridTemplateRows: `repeat(2, minmax(${statRowMin}px, 1fr))`,
-              gap: isCard ? 8 : isStory ? 8 : 6,
+              gap: isCard ? 8 : isExportStory ? 10 : isStory ? 8 : 6,
               width: "100%",
             }}
           >
