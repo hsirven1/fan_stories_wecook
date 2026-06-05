@@ -1,5 +1,10 @@
 import { useState, useRef, useId, useEffect } from "react";
-import html2canvas from "html2canvas";
+import {
+  SHARE_PNG_FILENAME,
+  SHARE_SHEET_TITLE,
+  captureShareCardToPngBlob,
+  getShareCaptureHostStyle,
+} from "./shareCapture";
 
 const WRAPPED_DATA = {
   meals: 87,
@@ -94,13 +99,22 @@ const ShareExportCta = () => (
 /** Share recap interior — `card` for on-screen slide; `story` + CTA for Instagram export only. */
 const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card", includeExportCta = false }) => {
   const isStory = variant === "story";
+  const isCard = variant === "card";
   const isExportStory = isStory && includeExportCta;
-  const gap = isStory ? 8 : 6;
-  const photoH = isStory ? 140 : 100;
-  const statRowMin = isStory ? 52 : 44;
-  const statValSize = isStory ? 20 : 18;
-  const personaTitleSize = isStory ? 18 : 16;
-  const harvestTitleSize = isStory ? 22 : 19;
+  const gap = isCard ? 8 : isStory ? 8 : 6;
+  const photoH = isCard ? 96 : isStory ? 140 : 100;
+  const statRowMin = isCard ? 52 : isStory ? 52 : 44;
+  const statValSize = isCard ? 22 : isStory ? 20 : 18;
+  const statLabelSize = isCard ? 11 : 9;
+  const personaTitleSize = isCard ? 20 : isStory ? 18 : 16;
+  const personaLabelSize = isCard ? 11 : 9;
+  const personaBodySize = isCard ? 13 : isStory ? 11 : 10;
+  const harvestTitleSize = isCard ? 24 : isStory ? 22 : 19;
+  const mealLabelSize = isCard ? 10 : 8;
+  const mealTitleSize = isCard ? 17 : isStory ? 15 : 14;
+  const logoSize = isCard ? 1.15 : isStory ? 1.1 : 1;
+  const boxPadding = isCard ? "10px 12px" : isStory ? "8px 10px" : "7px 9px";
+  const statBoxPadding = isCard ? "10px 12px" : isStory ? "8px 10px" : "6px 8px";
 
   return (
     <div
@@ -141,6 +155,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
           gap: isExportStory ? 8 : gap,
           overflow: isExportStory ? "visible" : "hidden",
           boxSizing: "border-box",
+          ...(isCard ? { padding: "10px 14px 0" } : {}),
         }}
       >
         <div
@@ -151,14 +166,14 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
             gap,
           }}
         >
-          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: isStory ? 6 : 4 }}>
-            <FreshPlateLogo color="rgba(245,240,232,0.95)" size={isStory ? 1.1 : 1} hideSubtitle />
+          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: isCard ? 6 : isStory ? 6 : 4 }}>
+            <FreshPlateLogo color="rgba(245,240,232,0.95)" size={logoSize} hideSubtitle />
             <div
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontWeight: 700,
                 fontSize: harvestTitleSize,
-                color: isExportStory ? "rgba(245,240,232,0.65)" : "rgba(245,240,232,0.45)",
+                color: isCard ? "rgba(245,240,232,0.62)" : isExportStory ? "rgba(245,240,232,0.65)" : "rgba(245,240,232,0.45)",
                 lineHeight: 1.1,
               }}
             >
@@ -172,21 +187,21 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
               flexShrink: 0,
               background: "rgba(245,240,232,0.07)",
               borderRadius: 12,
-              padding: isStory ? "8px 10px" : "7px 9px",
+              padding: boxPadding,
               border: "1px solid rgba(245,240,232,0.1)",
             }}
           >
-            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(245,240,232,0.4)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>Persona</div>
+            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: personaLabelSize, color: "rgba(245,240,232,0.4)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>Persona</div>
             <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: personaTitleSize, color: "#F5F0E8", lineHeight: 1.15 }}>{profile.title}</div>
             <p
               style={{
                 margin: 0,
                 marginTop: 4,
                 fontFamily: "'Inter', sans-serif",
-                fontSize: isStory ? 11 : 10,
+                fontSize: personaBodySize,
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: "rgba(245,240,232,0.5)",
+                color: isCard ? "rgba(245,240,232,0.62)" : "rgba(245,240,232,0.5)",
                 lineHeight: 1.35,
               }}
             >
@@ -200,7 +215,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
               gridTemplateRows: `repeat(2, minmax(${statRowMin}px, 1fr))`,
-              gap: isStory ? 8 : 6,
+              gap: isCard ? 8 : isStory ? 8 : 6,
               width: "100%",
             }}
           >
@@ -214,7 +229,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
                 key={i}
                 style={{
                   background: "rgba(245,240,232,0.06)",
-                  padding: isStory ? "8px 10px" : "6px 8px",
+                  padding: statBoxPadding,
                   borderRadius: 10,
                   border: "1px solid rgba(245,240,232,0.08)",
                   display: "flex",
@@ -225,7 +240,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
                 }}
               >
                 <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: statValSize, color: s.accent, lineHeight: 1, letterSpacing: -0.3 }}>{s.val}</div>
-                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.3, marginTop: 3 }}>{s.lbl}</div>
+                <div style={{ fontFamily: "'Inter', sans-serif", fontSize: statLabelSize, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.3, marginTop: 3 }}>{s.lbl}</div>
               </div>
             ))}
           </div>
@@ -267,15 +282,11 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
                 pointerEvents: "none",
               }}
             >
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 8, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.4, marginBottom: 2 }}>
+              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: mealLabelSize, color: "rgba(245,240,232,0.55)", textTransform: "uppercase", letterSpacing: 1.4, marginBottom: 2 }}>
                 Favorite meal
               </div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: isStory ? 15 : 14, color: "#F5F0E8", lineHeight: 1.15 }}>{data.favorite_meal}</div>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: mealTitleSize, color: "#F5F0E8", lineHeight: 1.15 }}>{data.favorite_meal}</div>
             </div>
-          </div>
-
-          <div style={{ flexShrink: 0, display: "flex", justifyContent: "flex-end" }}>
-            <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, color: "rgba(245,240,232,0.28)", letterSpacing: 1.2 }}>#FreshPlate2025</span>
           </div>
         </div>
 
@@ -302,44 +313,6 @@ const downloadPngBlob = (blob, filename = "fanstories-2025.png") => {
   a.click();
   URL.revokeObjectURL(url);
 };
-
-/** Instagram Story capture frame (9:16, iPhone logical size). */
-const SHARE_STORY_W = 390;
-const SHARE_STORY_H = 844;
-const SHARE_STORY_PADDING = "20px";
-const SHARE_PNG_FILENAME = "fanstories-2025.png";
-const SHARE_SHEET_TITLE = "My 2025 Harvest";
-
-/** Captures the 390×844 story frame (recap + export CTA). Element must be in-viewport (opacity ~0) for reliable paint. */
-async function captureShareCardToPngBlob(captureEl) {
-  await document.fonts.ready;
-  try {
-    await document.fonts.load('700 16px Inter');
-    await document.fonts.load('700 13px Inter');
-    await document.fonts.load('700 22px "Playfair Display"');
-    await document.fonts.load('700 19px "Playfair Display"');
-  } catch {
-    /* fall back to system fonts */
-  }
-
-  await new Promise((resolve) => setTimeout(resolve, 280));
-
-  const canvas = await html2canvas(captureEl, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: PALETTE.ink,
-    logging: false,
-    width: captureEl.offsetWidth,
-    height: captureEl.offsetHeight,
-    scrollX: 0,
-    scrollY: 0,
-    windowWidth: captureEl.offsetWidth,
-    windowHeight: captureEl.offsetHeight,
-  });
-  return await new Promise((resolve, reject) => {
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG export failed"))), "image/png");
-  });
-}
 
 const Grain = ({ opacity = 0.04 }) => {
   const filterId = `grain-${useId().replace(/:/g, "")}`;
@@ -832,6 +805,7 @@ export default function App() {
   };
 
   const slide = allSlides[idx];
+  const isLastSlide = idx === lastSlideIdx;
   const progressBar = PROGRESS_BAR[slide.progressBarTheme];
 
   return (
@@ -865,7 +839,7 @@ export default function App() {
               style={{
                 position: "absolute",
                 inset: 0,
-                padding: "36px 30px 60px",
+                padding: isLastSlide ? "48px 28px 56px" : "36px 30px 60px",
                 background: slide.bg,
                 opacity: visible ? 1 : 0,
                 transform: visible ? "translateY(0)" : `translateY(${dir * 14}px)`,
@@ -899,6 +873,7 @@ export default function App() {
               {allSlides.map((_, i) => (
                 <div
                   key={i}
+                  data-testid={`progress-dot-${i}`}
                   onClick={() => goTo(i)}
                   style={{
                     flex: 1,
@@ -939,24 +914,7 @@ export default function App() {
           </div>
 
           {idx === lastSlideIdx && (
-            <div
-              ref={shareCaptureRef}
-              aria-hidden="true"
-              style={{
-                position: "fixed",
-                left: 0,
-                top: 0,
-                width: SHARE_STORY_W,
-                height: SHARE_STORY_H,
-                boxSizing: "border-box",
-                padding: SHARE_STORY_PADDING,
-                background: PALETTE.ink,
-                overflow: "visible",
-                pointerEvents: "none",
-                opacity: 0.01,
-                zIndex: 0,
-              }}
-            >
+            <div ref={shareCaptureRef} aria-hidden="true" data-testid="share-capture-host" style={getShareCaptureHostStyle()}>
               <ShareCardScene
                 data={data}
                 profile={profile}
