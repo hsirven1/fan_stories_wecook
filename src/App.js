@@ -1,4 +1,5 @@
 import { useState, useRef, useId, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   SHARE_PNG_FILENAME,
   SHARE_SHEET_TITLE,
@@ -102,7 +103,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
   const isCard = variant === "card";
   const isExportStory = isStory && includeExportCta;
   const gap = isCard ? 8 : isExportStory ? 10 : isStory ? 8 : 6;
-  const photoH = isCard ? 96 : isExportStory ? 128 : isStory ? 140 : 100;
+  const photoH = isCard ? 96 : isExportStory ? 118 : isStory ? 140 : 100;
   const statRowMin = isCard ? 52 : isExportStory ? 56 : isStory ? 52 : 44;
   const statValSize = isCard ? 22 : isExportStory ? 24 : isStory ? 20 : 18;
   const statLabelSize = isCard ? 11 : isExportStory ? 12 : 9;
@@ -149,14 +150,16 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
         style={{
           position: "relative",
           zIndex: 5,
-          height: "100%",
+          height: isExportStory ? "auto" : "100%",
+          minHeight: isExportStory ? "100%" : undefined,
           display: "flex",
           flexDirection: "column",
+          justifyContent: isExportStory ? "flex-start" : undefined,
           gap: isExportStory ? 10 : gap,
-          overflow: isExportStory ? "visible" : "hidden",
+          overflow: "hidden",
           boxSizing: "border-box",
           ...(isCard ? { padding: "10px 14px 0" } : {}),
-          ...(isExportStory ? { padding: "4px 6px 0" } : {}),
+          ...(isExportStory ? { padding: "12px 8px 0" } : {}),
         }}
       >
         <div
@@ -175,7 +178,7 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
               alignItems: "center",
               textAlign: "center",
               gap: isExportStory ? 10 : isCard ? 6 : isStory ? 6 : 4,
-              ...(isExportStory ? { paddingTop: 8, paddingBottom: 4 } : {}),
+              ...(isExportStory ? { paddingTop: 16, paddingBottom: 6 } : {}),
             }}
           >
             <FreshPlateLogo color="rgba(245,240,232,0.95)" size={logoSize} hideSubtitle />
@@ -302,7 +305,13 @@ const ShareCardScene = ({ data, profile, shoppingTimeSavedHours, variant = "card
         </div>
 
         {includeExportCta && (
-          <div style={{ flexShrink: 0, marginTop: "auto", width: "100%" }}>
+          <div
+            style={{
+              flexShrink: 0,
+              width: "100%",
+              ...(isExportStory ? { marginTop: 10 } : { marginTop: "auto" }),
+            }}
+          >
             <ShareExportCta />
           </div>
         )}
@@ -924,17 +933,19 @@ export default function App() {
             />
           </div>
 
-          {idx === lastSlideIdx && (
-            <div ref={shareCaptureRef} aria-hidden="true" data-testid="share-capture-host" style={getShareCaptureHostStyle()}>
-              <ShareCardScene
-                data={data}
-                profile={profile}
-                shoppingTimeSavedHours={shoppingTimeSavedHours}
-                variant="story"
-                includeExportCta
-              />
-            </div>
-          )}
+          {idx === lastSlideIdx &&
+            createPortal(
+              <div ref={shareCaptureRef} aria-hidden="true" data-testid="share-capture-host" style={getShareCaptureHostStyle()}>
+                <ShareCardScene
+                  data={data}
+                  profile={profile}
+                  shoppingTimeSavedHours={shoppingTimeSavedHours}
+                  variant="story"
+                  includeExportCta
+                />
+              </div>,
+              document.body
+            )}
 
           {idx === lastSlideIdx && (
             <button

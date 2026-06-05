@@ -2,7 +2,7 @@ import html2canvas from "html2canvas";
 
 export const SHARE_STORY_W = 390;
 export const SHARE_STORY_H = 844;
-export const SHARE_STORY_PADDING = "36px 28px 20px";
+export const SHARE_STORY_PADDING = "52px 28px 12px";
 export const SHARE_CAPTURE_BG = "#1A1A1A";
 export const SHARE_PNG_FILENAME = "fanstories-2025.png";
 export const SHARE_SHEET_TITLE = "My 2025 Harvest";
@@ -18,7 +18,7 @@ export function getShareCaptureHostStyle() {
     boxSizing: "border-box",
     padding: SHARE_STORY_PADDING,
     background: SHARE_CAPTURE_BG,
-    overflow: "visible",
+    overflow: "hidden",
     pointerEvents: "none",
     visibility: "hidden",
     zIndex: -1,
@@ -59,6 +59,10 @@ export function getHtml2canvasShareOptions(captureEl) {
     logging: false,
     width: captureEl.offsetWidth || SHARE_STORY_W,
     height: captureEl.offsetHeight || SHARE_STORY_H,
+    scrollX: 0,
+    scrollY: 0,
+    x: 0,
+    y: 0,
   };
 }
 
