@@ -53,9 +53,9 @@ describe("pixelsHaveVisibleContent", () => {
   function fillBackgroundBuffer(width, height) {
     const data = new Uint8ClampedArray(width * height * 4);
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = 26;
-      data[i + 1] = 26;
-      data[i + 2] = 26;
+      data[i] = 3;
+      data[i + 1] = 137;
+      data[i + 2] = 78;
       data[i + 3] = 255;
     }
     return data;
@@ -70,7 +70,7 @@ describe("pixelsHaveVisibleContent", () => {
     const data = fillBackgroundBuffer(100, 100);
     for (let x = 0; x < 100; x += 1) {
       const i = (80 * 100 + x) * 4;
-      data[i] = 196;
+      data[i] = 3;
       data[i + 1] = 98;
       data[i + 2] = 45;
     }
@@ -95,16 +95,16 @@ describe("captureShareCardToPngBlob", () => {
     Object.assign(host.style, getShareCaptureHostStyle());
     host.style.width = `${SHARE_STORY_W}px`;
     host.style.height = `${SHARE_STORY_H}px`;
-    host.innerHTML = "<div>Your 2025 Harvest</div>";
+    host.innerHTML = "<div>Your 2026 Review</div>";
     document.body.appendChild(host);
 
     const visible = fillBackgroundOnly(SHARE_STORY_W, SHARE_STORY_H);
     for (let y = SHARE_STORY_H - 80; y < SHARE_STORY_H; y += 1) {
       for (let x = 0; x < SHARE_STORY_W; x += 1) {
         const i = (y * SHARE_STORY_W + x) * 4;
-        visible[i] = 196;
-        visible[i + 1] = 98;
-        visible[i + 2] = 45;
+        visible[i] = 255;
+        visible[i + 1] = 255;
+        visible[i + 2] = 255;
       }
     }
 

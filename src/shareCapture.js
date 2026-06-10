@@ -3,9 +3,9 @@ import html2canvas from "html2canvas";
 export const SHARE_STORY_W = 390;
 export const SHARE_STORY_H = 844;
 export const SHARE_STORY_PADDING = "52px 28px 12px";
-export const SHARE_CAPTURE_BG = "#1A1A1A";
-export const SHARE_PNG_FILENAME = "fanstories-2025.png";
-export const SHARE_SHEET_TITLE = "My 2025 Harvest";
+export const SHARE_CAPTURE_BG = "#03894e";
+export const SHARE_PNG_FILENAME = "wecook-review-2026.png";
+export const SHARE_SHEET_TITLE = "My 2026 WeCook Review";
 
 /** Host styles while off-screen — never use low opacity (html2canvas captures it as nearly black). */
 export function getShareCaptureHostStyle() {
@@ -73,7 +73,7 @@ export function pixelsHaveVisibleContent(
   data,
   width,
   height,
-  backgroundRgb = [26, 26, 26],
+  backgroundRgb = [3, 137, 78],
   minDistinctRatio = 0.008
 ) {
   if (!data?.length || !width || !height) return false;
@@ -97,7 +97,7 @@ export function pixelsHaveVisibleContent(
   return distinct / total >= minDistinctRatio;
 }
 
-export function captureCanvasHasVisibleContent(canvas, backgroundRgb = [26, 26, 26], minDistinctRatio = 0.008) {
+export function captureCanvasHasVisibleContent(canvas, backgroundRgb = [3, 137, 78], minDistinctRatio = 0.008) {
   const ctx = canvas.getContext?.("2d");
   if (!ctx) return false;
 
@@ -112,8 +112,10 @@ export async function loadShareCaptureFonts() {
   try {
     await document.fonts.load("700 16px Inter");
     await document.fonts.load("700 13px Inter");
-    await document.fonts.load('700 22px "Playfair Display"');
-    await document.fonts.load('700 19px "Playfair Display"');
+    await document.fonts.load("900 48px Inter");
+    await document.fonts.load("900 11px Inter");
+    await document.fonts.load("800 22px Inter");
+    await document.fonts.load("800 18px Inter");
   } catch {
     /* fall back to system fonts */
   }
